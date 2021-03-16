@@ -62,12 +62,12 @@ func generateNewSignedToken(privateKeyPath string, resp *http.Response) (string,
 	return signature, oneTimeToken
 }
 
-func (w *Wise) retryRequestWithToken(method, endPoint, signature, oneTimeToken string, data *bytes.Buffer, withUUID bool) []byte {
+func (w *Wise) retryRequestWithToken(method, endPoint, signature, oneTimeToken string, data string, withUUID bool) []byte {
 	var apiURL = "https://api.transferwise.com"
 	if w.SandBox {
 		apiURL = "https://api.sandbox.transferwise.tech"
 	}
-	req, err := http.NewRequest(method, apiURL+endPoint, data)
+	req, err := http.NewRequest(method, apiURL+endPoint, bytes.NewBufferString(data))
 	if err != nil {
 		log.Println(err.Error())
 	}
