@@ -62,13 +62,17 @@ func generateNewSignedToken(privateKeyPath string, resp *http.Response) (string,
 	return signature, oneTimeToken
 }
 
-func retryRequestWithToken(apiKey, method, endPoint, signature, oneTimeToken string, data *bytes.Buffer, withUUID bool) []byte {
-	req, err := http.NewRequest(method, TransferWiseAPI+endPoint, data)
+func (w *Wise) retryRequestWithToken(method, endPoint, signature, oneTimeToken string, data *bytes.Buffer, withUUID bool) []byte {
+	var apiURL = "https://api.transferwise.com"
+	if w.SandBox {
+		apiURL = "https://api.sandbox.transferwise.tech"
+	}
+	req, err := http.NewRequest(method, apiURL+endPoint, data)
 	if err != nil {
 		log.Println(err.Error())
 	}
 	log.Println("Signing new request with: " + oneTimeToken + " and " + signature)
-	req.Header.Set("Authorization", "Bearer " + apiKey)
+	req.Header.Set("Authorization", "Bearer " + w.APIKey)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-2fa-approval", oneTimeToken)
 	req.Header.Set("X-Signature", signature)
