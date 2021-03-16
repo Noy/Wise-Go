@@ -50,7 +50,7 @@ func (w *Wise) BaseTransferWiseGetRequest(endPoint string) ([]byte, error) {
 		log.Println("403 detected, doing secure layer retry.")
 		// generating from the current response
 		signature, oneTimeToken := generateNewSignedToken(w.KeyFile, resp)
-		return w.retryRequestWithToken("GET", endPoint, signature, oneTimeToken, nil, false), nil
+		return w.retryRequestWithToken("GET", endPoint, signature, oneTimeToken, "", false), nil
 	} else {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
@@ -69,7 +69,7 @@ func (w *Wise) PostTransferWiseRequest(endPoint string, withUUID bool, data stri
 	if resp.StatusCode == 403 {
 		log.Println("403 detected, doing secure layer retry.")
 		signature, oneTimeToken := generateNewSignedToken(w.KeyFile, resp)
-		return w.retryRequestWithToken("POST", endPoint, signature, oneTimeToken, bytes.NewBufferString(data), withUUID), newUUID
+		return w.retryRequestWithToken("POST", endPoint, signature, oneTimeToken, data, withUUID), newUUID
 	} else {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
