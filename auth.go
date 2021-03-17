@@ -58,7 +58,7 @@ func (w *Wise) generateNewSignedToken(privateKeyPath string, resp *http.Response
 	}
 	hashed := sha256.Sum256([]byte(oneTimeToken))
 	if w.Debug {
-		log.Printf("Hash successful, OTT is now: %v", hashed)
+		log.Printf("Hash successful, OTT is now: %v", string(hashed[:]))
 	}
 	signedToken, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA256, hashed[:])
 	if err != nil {
