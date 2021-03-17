@@ -40,26 +40,34 @@ func loadPrivateKey(filePath string) (*rsa.PrivateKey, error) {
 	}
 }
 
-func generateNewSignedToken(privateKeyPath string, resp *http.Response) (string, string) {
+func (w *Wise) generateNewSignedToken(privateKeyPath string, resp *http.Response) (string, string) {
 	oneTimeToken := resp.Header.Get("x-2fa-approval")
+	if w.Debug {
+		log.Printf("OTT was %v from the previous response (%v)", oneTimeToken, resp.Request.URL)
+	}
 	if oneTimeToken == "" {
 		log.Println("Could not get twoFactor Header, stopping!")
 		return "", ""
 	}
 	privateKey, err := loadPrivateKey(privateKeyPath)
+	if w.Debug {
+		log.Printf("Private Key successfully laoded: %v", privateKey)
+	}
 	if err != nil {
 		fmt.Errorf("signer is damaged: %v", err)
 	}
 	hashed := sha256.Sum256([]byte(oneTimeToken))
-
-	signedToken, err := rsa.SignPKCS1v15(rand.Reader, privateKey,
-		crypto.SHA256, hashed[:],
-	)
+	if w.Debug {
+		log.Printf("Hash successful, OTT is now: %v", hashed)
+	}
+	signedToken, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA256, hashed[:])
 	if err != nil {
 		fmt.Errorf("could not sign token: %v", err)
+		return "", ""
+	} else {
+		signature := base64.StdEncoding.EncodeToString(signedToken)
+		return signature, oneTimeToken
 	}
-	signature := base64.StdEncoding.EncodeToString(signedToken)
-	return signature, oneTimeToken
 }
 
 func (w *Wise) retryRequestWithToken(method, endPoint, signature, oneTimeToken string, data io.Reader, withUUID bool) []byte {
@@ -71,7 +79,9 @@ func (w *Wise) retryRequestWithToken(method, endPoint, signature, oneTimeToken s
 	if err != nil {
 		log.Println(err.Error())
 	}
-	log.Println("Signing new request with: " + oneTimeToken + " and " + signature)
+	if w.Debug {
+		log.Printf("Signing new request with %v and a OTT of %v ", oneTimeToken, signature)
+	}
 	req.Header.Set("Authorization", "Bearer "+w.APIKey)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("x-2fa-approval", oneTimeToken)
