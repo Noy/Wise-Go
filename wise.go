@@ -12,6 +12,7 @@ import (
 type Wise struct {
 	SandBox         bool
 	APIKey, KeyFile string
+	Debug           bool
 }
 
 func (w *Wise) sendRequest(method, endPoint string, body io.Reader, withUUID bool) (*http.Response, error, string) {
@@ -34,6 +35,9 @@ func (w *Wise) sendRequest(method, endPoint string, body io.Reader, withUUID boo
 	if err != nil {
 		return nil, err, ""
 	}
+	if w.Debug {
+		log.Printf("Did %v request. The status code was %v\n", endPoint, resp.StatusCode)
+	}
 	return resp, nil, newUUID
 }
 
@@ -47,14 +51,23 @@ func (w *Wise) BaseTransferWiseGetRequest(endPoint string) ([]byte, error) {
 		return nil, err
 	}
 	if resp.StatusCode == 403 {
-		log.Println("403 detected, doing secure layer retry.")
-		// generating from the current response
+		if w.Debug {
+			log.Println("403 detected, doing secure layer retry.")
+		}
 		signature, oneTimeToken := generateNewSignedToken(w.KeyFile, resp)
-		return w.retryRequestWithToken("GET", endPoint, signature, oneTimeToken, nil, false), nil
+		body := w.retryRequestWithToken("GET", endPoint, signature, oneTimeToken, nil, false)
+		if w.Debug {
+			log.Printf("Signature was %v and OTT was %v", signature, oneTimeToken)
+			log.Printf("Did retry request, ended up with: %v\n", string(body))
+		}
+		return body, nil
 	} else {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
+		}
+		if w.Debug {
+			log.Printf("Regular request with no strong auth, ended up with: %v\n", string(body))
 		}
 		return body, nil
 	}
@@ -67,13 +80,23 @@ func (w *Wise) PostTransferWiseRequest(endPoint string, withUUID bool, data stri
 		log.Println(err.Error())
 	}
 	if resp.StatusCode == 403 {
-		log.Println("403 detected, doing secure layer retry.")
+		if w.Debug {
+			log.Println("403 detected, doing secure layer retry.")
+		}
 		signature, oneTimeToken := generateNewSignedToken(w.KeyFile, resp)
-		return w.retryRequestWithToken("POST", endPoint, signature, oneTimeToken, bytes.NewBufferString(data), withUUID), newUUID
+		body := w.retryRequestWithToken("POST", endPoint, signature, oneTimeToken, bytes.NewBufferString(data), withUUID)
+		if w.Debug {
+			log.Printf("Signature was %v and OTT was %v", signature, oneTimeToken)
+			log.Printf("Did retry request, ended up with: %v\n", string(body))
+		}
+		return body, newUUID
 	} else {
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			log.Println(err.Error())
+		}
+		if w.Debug {
+			log.Printf("Regular request with no strong auth, ended up with: %v\n", string(body))
 		}
 		return body, newUUID
 	}
