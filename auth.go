@@ -51,7 +51,7 @@ func (w *Wise) generateNewSignedToken(privateKeyPath string, resp *http.Response
 	}
 	privateKey, err := loadPrivateKey(privateKeyPath)
 	if w.Debug {
-		log.Printf("Private Key successfully laoded: %v", privateKey)
+		log.Printf("Private Key successfully laoded from: %v", privateKeyPath)
 	}
 	if err != nil {
 		fmt.Errorf("signer is damaged: %v", err)
