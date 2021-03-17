@@ -57,16 +57,12 @@ func (w *Wise) generateNewSignedToken(privateKeyPath string, resp *http.Response
 		fmt.Errorf("signer is damaged: %v", err)
 	}
 	hashed := sha256.Sum256([]byte(oneTimeToken))
-	if w.Debug {
-		log.Printf("Hash successful, OTT is now: %v\n", string(hashed[:]))
-	}
 	signedToken, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA256, hashed[:])
 	if err != nil {
 		fmt.Errorf("could not sign token: %v", err)
 		return "", ""
 	} else {
-		signature := base64.StdEncoding.EncodeToString(signedToken)
-		return signature, oneTimeToken
+		return base64.StdEncoding.EncodeToString(signedToken), oneTimeToken
 	}
 }
 
