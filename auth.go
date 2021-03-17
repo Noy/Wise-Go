@@ -80,7 +80,7 @@ func (w *Wise) retryRequestWithToken(method, endPoint, signature, oneTimeToken s
 		log.Println(err.Error())
 	}
 	if w.Debug {
-		log.Printf("Signing new request with %v and a OTT of %v ", oneTimeToken, signature)
+		log.Printf("Signing new request with %v and a OTT of %v ", signature, oneTimeToken)
 	}
 	req.Header.Set("Authorization", "Bearer "+w.APIKey)
 	req.Header.Set("Content-Type", "application/json")
