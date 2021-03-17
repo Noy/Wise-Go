@@ -25,6 +25,7 @@ func (w *Wise) sendRequest(method, endPoint string, body io.Reader, withUUID boo
 		return nil, err, ""
 	}
 	req.Header.Set("Authorization", "Bearer "+w.APIKey)
+	req.Header.Set("Content-Type", "application/json")
 	var newUUID string
 	if withUUID {
 		newUUID = uuid.New().String()
