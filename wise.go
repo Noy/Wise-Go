@@ -13,6 +13,7 @@ type Wise struct {
 	SandBox         bool
 	APIKey, KeyFile string
 	Debug           bool
+	Profiles        map[string][]string
 }
 
 func (w *Wise) sendRequest(method, endPoint string, body io.Reader, withUUID bool) (*http.Response, error, string) {
