@@ -88,21 +88,57 @@ type Transactions struct {
 }
 
 type Recipient struct {
-	ID                int64  `json:"id"`
-	Business          int64  `json:"business"`
-	Profile           int64  `json:"profile"`
-	AccountHolderName string `json:"accountHolderName"`
-	Currency          string `json:"currency"`
-	Country           string `json:"country"`
-	Type              string `json:"type"`
-	Details           struct {
-		AccountNumber string `json:"accountNumber"`
-		SortCode      string `json:"sortCode"`
-		IBAN          string `json:"IBAN"`
-		BIC           string `json:"BIC"`
-		PhoneNumber   string `json:"phoneNumber"`
-		Abartn        string `json:"abartn"`
+	RecipientContent []RecipientContent `json:"content"`
+	Sort             struct {
+		Empty    bool `json:"empty"`
+		Unsorted bool `json:"unsorted"`
+		Sorted   bool `json:"sorted"`
+	} `json:"sort"`
+	Size int64 `json:"size"`
+}
+
+type RecipientContent struct {
+	ID        int64 `json:"id"`
+	CreatorId int64 `json:"creatorId"`
+	ProfileId int64 `json:"profileId"`
+	Name      struct {
+		FullName                 string `json:"fullName"`
+		GivenName                string `json:"givenName"`
+		FamilyName               string `json:"familyName"`
+		MiddleName               string `json:"middleName"`
+		PatronymicName           string `json:"patronymicName"`
+		CannotHavePatronymicName bool   `json:"cannotHavePatronymicName"`
+	} `json:"name"`
+	Currency        string `json:"currency"`
+	Country         string `json:"country"`
+	Type            string `json:"type"`
+	LegalEntityType string `json:"legalEntityType"`
+	Active          bool   `json:"active"`
+	Details         struct {
+		BankName                   string `json:"bankName"`
+		Iban                       string `json:"iban"`
+		SwiftCode                  string `json:"swiftCode"`
+		Bic                        string `json:"bic"`
+		Reference                  string `json:"reference"`
+		BalanceAccountProfileId    string `json:"balanceAccountProfileId"`
+		AccountNumber              string `json:"accountNumber"`
+		SortCode                   string `json:"sortCode"`
+		HashedByLooseHashAlgorithm string `json:"hashedByLooseHashAlgorithm"`
 	} `json:"details"`
+	CommonFieldMap struct {
+		AccountNumberField string `json:"accountNumberField"`
+		BankCodeField      string `json:"bankCodeField"`
+	} `json:"commonFieldMap"`
+	IsDefaultAccount   bool            `json:"isDefaultAccount"`
+	Hash               string          `json:"hash"`
+	AccountSummary     string          `json:"accountSummary"`
+	LongAccountSummary string          `json:"longAccountSummary"`
+	DisplayFields      []DisplayFields `json:"displayFields"`
+	OwnedByCustomer    bool            `json:"ownedByCustomer"`
+}
+type DisplayFields struct {
+	Label string `json:"label"`
+	Value string `json:"value"`
 }
 
 type ConfirmedTransaction struct {

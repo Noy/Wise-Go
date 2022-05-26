@@ -13,7 +13,14 @@ type Wise struct {
 	SandBox         bool
 	APIKey, KeyFile string
 	Debug           bool
-	Profiles        map[string][]string
+	Profiles        []AccountProfile
+}
+
+type AccountProfile struct {
+	Name                string `json:"name"`
+	BorderlessAccountId string `json:"balance_id"`
+	AccountType         string `json:"account_type"`
+	ProfileId           string `json:"profile_id"`
 }
 
 func (w *Wise) sendRequest(method, endPoint string, body io.Reader, withUUID bool) (*http.Response, error, string) {
