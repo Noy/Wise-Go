@@ -1,5 +1,54 @@
 package wisego
 
+type Profile struct {
+	Type    string `json:"type"`
+	ID      int64  `json:"id"`
+	UserId  int64  `json:"userId"`
+	Address struct {
+		AddressFirstLine string `json:"addressFirstLine"`
+		City             string `json:"city"`
+		CountryIso2Code  string `json:"countryIso2Code"`
+		CountryIso3Code  string `json:"countryIso3Code"`
+		PostCode         string `json:"postCode"`
+		StateCode        string `json:"stateCode"`
+	}
+	Email                 string `json:"email"`
+	CreatedAt             string `json:"createdAt"`
+	UpdatedAt             string `json:"updatedAt"`
+	Obfuscated            bool   `json:"obfuscated"`
+	Avatar                string `json:"avatar"`
+	BusinessName          string `json:"businessName"`
+	RegistrationNumber    string `json:"registrationNumber"`
+	DescriptionOfBusiness string `json:"descriptionOfBusiness"`
+	CompanyType           string `json:"companyType"`
+	CompanyRole           string `json:"companyRole"`
+	FirstLevelCategory    string `json:"firstLevelCategory"`
+	SecondLevelCategory   string `json:"secondLevelCategory"`
+	OperationalAddresses  []struct {
+		AddressFirstLine string      `json:"addressFirstLine"`
+		City             string      `json:"city"`
+		CountryIso2Code  string      `json:"countryIso2Code"`
+		CountryIso3Code  string      `json:"countryIso3Code"`
+		PostCode         string      `json:"postCode"`
+		StateCode        interface{} `json:"stateCode"`
+	} `json:"operationalAddresses"`
+	FullName string `json:"fullName"`
+	//Personal
+	CurrentState string `json:"currentState"`
+	FirstName    string `json:"firstName"`
+	LastName     string `json:"lastName"`
+	PlaceOfBirth struct {
+		RawValue        string `json:"rawValue"`
+		City            string `json:"city"`
+		CountryIso2Code string `json:"countryIso2Code"`
+		CountryIso3Code string `json:"countryIso3Code"`
+		PostCode        string `json:"postCode"`
+		StateCode       string `json:"stateCode"`
+	} `json:"placeOfBirth"`
+	PhoneNumber string `json:"phoneNumber"`
+	Occupation  string `json:"occupation"`
+}
+
 type BorderlessAccounts struct {
 	ID               int64      `json:"id"`
 	ProfileID        int64      `json:"profileId"`
