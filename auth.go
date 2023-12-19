@@ -29,12 +29,16 @@ func loadPrivateKey(filePath string) (*rsa.PrivateKey, error) {
 	}
 
 	switch block.Type {
-	case "RSA PRIVATE KEY":
-		privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
+	case "PRIVATE KEY":
+		privateKey, err := x509.ParsePKCS8PrivateKey(block.Bytes)
 		if err != nil {
 			return &rsa.PrivateKey{}, err
 		}
-		return privateKey, nil
+		rsaKey, ok := privateKey.(*rsa.PrivateKey)
+		if !ok {
+			log.Fatalf("got unexpected key type: %T", privateKey)
+		}
+		return rsaKey, nil
 	default:
 		return &rsa.PrivateKey{}, fmt.Errorf("unsupported key type %q", block.Type)
 	}
@@ -50,11 +54,13 @@ func (w *Wise) generateNewSignedToken(privateKeyPath string, resp *http.Response
 		return "", ""
 	}
 	privateKey, err := loadPrivateKey(privateKeyPath)
-	if w.Debug {
-		log.Printf("Private Key successfully laoded from: %v", privateKeyPath)
-	}
 	if err != nil {
 		fmt.Errorf("signer is damaged: %v", err)
+		return "Error", oneTimeToken
+	} else {
+		if w.Debug {
+			log.Printf("Private Key successfully laoded from: %v", privateKeyPath)
+		}
 	}
 	hashed := sha256.Sum256([]byte(oneTimeToken))
 	signedToken, err := rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA256, hashed[:])
