@@ -1,6 +1,8 @@
 package wisego
 
-type Statements struct {
+import "time"
+
+type BalanceStatement struct {
 	AccountHolder struct {
 		Type    string `json:"type"`
 		Address struct {
@@ -22,8 +24,46 @@ type Statements struct {
 		StateCode string `json:"stateCode"`
 		Country   string `json:"country"`
 	} `json:"issuer"`
-	BankDetails  []BankDetails  `json:"bankDetails"`
-	Transactions []Transactions `json:"transactions"`
+	BankDetails             []BankDetails  `json:"bankDetails"`
+	Transactions            []Transactions `json:"transactions"`
+	StartOfStatementBalance struct {
+		Value    float64 `json:"value"`
+		Currency string  `json:"currency"`
+		Zero     bool    `json:"zero"`
+	} `json:"startOfStatementBalance"`
+	EndOfStatementBalance struct {
+		Value    float64 `json:"value"`
+		Currency string  `json:"currency"`
+		Zero     bool    `json:"zero"`
+	} `json:"endOfStatementBalance"`
+	EndOfStatementUnrealisedGainLoss interface{} `json:"endOfStatementUnrealisedGainLoss"`
+	BalanceAssetConfiguration        interface{} `json:"balanceAssetConfiguration"`
+	Query                            struct {
+		IntervalStart time.Time `json:"intervalStart"`
+		IntervalEnd   time.Time `json:"intervalEnd"`
+		Type          string    `json:"type"`
+		AddStamp      bool      `json:"addStamp"`
+		Currency      string    `json:"currency"`
+		ProfileId     int       `json:"profileId"`
+		Timezone      string    `json:"timezone"`
+	} `json:"query"`
+	Request struct {
+		Id            string      `json:"id"`
+		CreationTime  time.Time   `json:"creationTime"`
+		ProfileId     int         `json:"profileId"`
+		Currency      string      `json:"currency"`
+		BalanceId     int         `json:"balanceId"`
+		BalanceName   interface{} `json:"balanceName"`
+		IntervalStart time.Time   `json:"intervalStart"`
+		IntervalEnd   time.Time   `json:"intervalEnd"`
+	} `json:"request"`
+	FeeSummary struct {
+		SummaryTitle    string        `json:"summaryTitle"`
+		FromTitle       string        `json:"fromTitle"`
+		ToTitle         string        `json:"toTitle"`
+		FeesTitle       string        `json:"feesTitle"`
+		FeeSummaryItems []interface{} `json:"feeSummaryItems"`
+	} `json:"feeSummary"`
 }
 
 type BankDetails struct {
@@ -57,9 +97,11 @@ type Transactions struct {
 		Currency string  `json:"currency"`
 	} `json:"totalFees"`
 	Details struct {
-		Type         string `json:"type"`
-		Description  string `json:"description"`
-		SourceAmount struct {
+		Type             string `json:"type"`
+		Description      string `json:"description"`
+		Originator       string `json:"originator"`
+		PaymentReference string `json:"paymentReference"`
+		SourceAmount     struct {
 			Value    float64 `json:"value"`
 			Currency string  `json:"currency"`
 		} `json:"sourceAmount"`
